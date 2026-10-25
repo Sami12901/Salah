@@ -1,0 +1,136 @@
+# HANDOFF — Salah (Android project)
+
+Read this first if you are a new assistant/agent picking up this project. It exists so you do **not**
+have to guess what was done, what was verified, and what is still open.
+
+Last updated: 2026-10-25 · Branch `main` · Tag `v1.0.0` · HEAD `cac7bfe`
+
+---
+
+## 1. What this project is
+
+**Salah** — an offline-first Android app for prayer times, the Quran and daily worship.
+Kotlin + Jetpack Compose (Material 3), MVVM with `core/ data/ domain/ feature/` layering, Room,
+DataStore, WorkManager, AlarmManager + notifications, Glance widget, Media3 audio.
+
+Hard constraints the original requester set — **do not break these**:
+
+- No Firebase, no custom cloud server, no accounts, no subscriptions, no paid services for core use.
+- Never invent religious content: no fabricated hadith, no invented grading, no invented translations,
+  no "verified/approved" claims.
+- Never fabricate test results or claim device testing that did not happen.
+- Never silently change the user's calculation method or Asr school; they are separate settings.
+- No hidden network calls — every host must be listed in `API_SOURCES.md` and justified in `PRIVACY.md`.
+- Original branding/UI only; no copied assets or third-party app design.
+- Never present a hardcoded gold price, nisab value or AlAdhan response as live/current data.
+
+## 2. Current state — verified facts
+
+| Item | State |
+| --- | --- |
+| Source | 171 tracked files, ~13k lines of Kotlin in `app/src/main/kotlin/com/salahmate/app/` |
+| Unit tests | **96 tests, 96 passed, 0 failed** (last run before the newest docs-only commits) |
+| Debug build | **BUILD SUCCESSFUL**, APK ≈28 MB (`app-debug.apk`) |
+| Git | `main` at `cac7bfe`, clean, tagged `v1.0.0`, bundle at `/home/user/salah-repo.bundle` |
+| Published to GitHub | **No** — no credential exists in the sandbox (see §6) |
+| Release build | Never run (no keystore) |
+| Device testing | **None.** No emulator, no phone, ever |
+
+### Test classes (all passing)
+
+`HijriCalendarTest` 6 · `HijriMonthTest` 5 · `CompassMathTest` 9 · `NotificationPostingTest` 6
+(Robolectric) · `NotificationContentTest` 4 · `PrayerAlarmComputeTest` 5 · `AlAdhanParsingTest` 6 ·
+`AyahAudioTest` 5 · `BackupCryptoTest` 6 · `LocalAdhanProviderTest` 8 · `QuranAyahNumberTest` 4 ·
+`HifzSchedulerTest` 3 · `PrayerMonthTest` 6 · `PrayerScheduleTest` 8 · `ZakatCalculatorTest` 9 ·
+`WidgetContentTest` 6
+
+## 3. What is implemented
+
+Prayer times on device (Adhan) + optional AlAdhan provider behind `PrayerProvider` with visible
+fallback · separate method/Asr settings · per-prayer minute adjustments · high-latitude rule · Imsak
+and last-third values · Room-cached daily schedule · reminders (per-prayer opt-in, silent channel,
+advance, snooze, test, exact-with-fallback, re-arm on boot/timezone/time change + daily worker) ·
+Glance widget (compact/medium/expanded) · monthly timetable · Quran reader (all 114 surahs bundled
+offline, translations fetched+cached, per-ayah audio with offline preference, bookmarks, last-read,
+search, downloads) · Hifz tracker · Hadith library (2 bundled collections + optional downloads,
+source-supplied grading only) · Dua/Adhkar · Learning (Asma ul Husna, Kalimas, Wudu) · Tasbih ·
+Prayer tracking · Ramadan · Islamic calendar · Zakat calculator · Qibla compass · mosque finder
+(delegates to maps) · 3-step onboarding · encrypted backup (AES-256-GCM + PBKDF2) · Bengali/English
+UI, Arabic RTL option · splash · single-top navigation and Back-to-Home on secondary tabs.
+
+## 4. What is NOT verified — say so, do not paper over it
+
+These have unit-tested *logic* but have **never** run on hardware:
+
+1. Alarm delivery at the exact minute, Doze behaviour, exact-alarm revocation fallback.
+2. Glance widget rendering/refresh on a real launcher.
+3. Compass with real sensors (maths tested; hardware not).
+4. Media3 audio playback through the speaker, seeking, auto-advance.
+5. Android 13/14/15 notification+exact-alarm permission dialogs.
+6. RTL visual inspection, tablet reflow.
+
+`TESTING.md` holds a 20-step manual device checklist for exactly these.
+
+## 5. Open work, in priority order
+
+1. **Release build + R8/ProGuard pass** (`assembleRelease`) — never executed; minification is on for
+   release and could break reflection/serialization. Add a throwaway keystore, build, install.
+2. **Device test pass** — run the TESTING.md checklist, then move items out of §4 as they pass.
+3. **`com.batoulapps.adhan:adhan:1.2.1` licence is unconfirmed** — its POM has an empty `<license/>`.
+   This is the only true release blocker. Either confirm upstream or replace with an in-house solar
+   implementation; `LocalAdhanProviderTest` already pins expected output within ±2 minutes so a swap
+   is verifiable.
+4. Room migration test v1 → v2 (schema export exists in `app/schemas/`, no migration test yet).
+5. Instrumented tests for Compose screens (none exist; `androidTest` has only dependencies).
+6. Rename the package `com.salahmate.app` → `app.salah` **only** if breaking upgrades is acceptable
+   (applicationId change means a new install, not an update).
+
+## 6. Environment gotchas — these cost real time
+
+- **Toolchain lives outside the snapshot.** `/opt/jdk`, `/opt/android-sdk`, `/opt/gradle-home` and the
+  swap file all vanish on sandbox reset. Rebuild script is in `BUILD.md` § "Rebuilding the toolchain".
+- **`.git` is not preserved by workspace snapshots.** Restore with
+  `git clone /home/user/salah-repo.bundle .` — regenerate the bundle after any commit you care about:
+  `git bundle create /home/user/salah-repo.bundle --all`.
+- **`gradlew` loses its executable bit** after a restore → `chmod +x gradlew` (that is the only cause
+  of `Permission denied` on `./gradlew`).
+- **No swap = Gradle daemon "disappears unexpectedly"** (kernel OOM). Keep `-Xmx1280m`, add swap.
+- **No GitHub credential exists.** `api.github.com` is reachable but `POST /user/repos` returns 401.
+  `publish.sh` is ready; it needs `GITHUB_TOKEN` or `gh auth login`. Do not claim a push happened.
+- Kotlin quirks already fixed — **do not reintroduce**:
+  `flow.first(x)` is invalid here, always `x.first()` · Room cannot persist `Instant` (use Long) ·
+  `@Upsert` misuse · Compose BOM must stay 2025.12.01 with AGP 8.13.2 · no `textDirection` parameter
+  on `Text` (set it in the `arabicStyle` TextStyle) · `StatusPill` takes `color`, not `positive` ·
+  `divider` → `HorizontalDivider`.
+
+## 7. Bugs already found and fixed — do not re-fix or accidentally revert
+
+- Silent prayer notification channel was `IMPORTANCE_DEFAULT` (still played a sound) → now
+  `IMPORTANCE_LOW`.
+- `PrayerNotifier.cancelAll()` left the test notification (id 9001) alive.
+- Alarm cancellation targeted a hardcoded `2000-01-01` placeholder, so real alarms were never
+  cancelled → scheduled alarms are now persisted by identity (`prayer|date|advance`) and replayed.
+- Back from a secondary tab exited the app; detail screens could stack duplicates → fixed.
+- Compass dial jumped at the 0°/360° boundary → shortest-arc smoothing in `CompassMath.smooth`.
+
+## 8. First five commands for a new session
+
+```bash
+cd /home/user/salahmate
+git clone /home/user/salah-repo.bundle . 2>/dev/null || true   # only if .git is missing
+chmod +x gradlew
+# rebuild toolchain per BUILD.md if /opt/jdk is missing, then:
+export JAVA_HOME=/opt/jdk ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
+       GRADLE_USER_HOME=/opt/gradle-home PATH=/opt/jdk/bin:$PATH
+./gradlew :app:testDebugUnitTest :app:assembleDebug --console=plain
+```
+
+Expect: 96 tests pass, APK produced. If the numbers differ, investigate before trusting this file.
+
+## 9. Document map
+
+`README.md` overview + verified/not-verified matrix · `BUILD.md` toolchain and commands ·
+`TESTING.md` real results + device checklist · `API_SOURCES.md` every endpoint and verified fields ·
+`CONTENT_LICENSES.md` content + library licences (incl. the Adhan caveat) · `PRIVACY.md` data flows and
+permissions · `RELEASE_CHECKLIST.md` blockers · `PUBLISHING.md` GitHub/CI setup · `CHANGELOG.md`
+changes + known limitations · `CONTRIBUTING.md` project rules.

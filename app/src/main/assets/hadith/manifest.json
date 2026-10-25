@@ -1,0 +1,92 @@
+{
+  "bundled": [
+    {
+      "id": "nawawi",
+      "name": "Forty Hadith of an-Nawawi",
+      "languages": [
+        "ara",
+        "ben",
+        "eng"
+      ],
+      "hadithCount": 42,
+      "asset": "hadith/nawawi.json",
+      "bytes": 143363
+    },
+    {
+      "id": "qudsi",
+      "name": "Forty Hadith Qudsi",
+      "languages": [
+        "ara",
+        "eng"
+      ],
+      "hadithCount": 40,
+      "asset": "hadith/qudsi.json",
+      "bytes": 89854
+    }
+  ],
+  "downloadable": [
+    {
+      "id": "bukhari",
+      "name": "Sahih al-Bukhari",
+      "languages": [
+        "ara",
+        "ben",
+        "eng"
+      ]
+    },
+    {
+      "id": "muslim",
+      "name": "Sahih Muslim",
+      "languages": [
+        "ara",
+        "ben",
+        "eng"
+      ]
+    },
+    {
+      "id": "abudawud",
+      "name": "Sunan Abu Dawud",
+      "languages": [
+        "ara",
+        "ben",
+        "eng"
+      ]
+    },
+    {
+      "id": "tirmidhi",
+      "name": "Jami' at-Tirmidhi",
+      "languages": [
+        "ara",
+        "ben",
+        "eng"
+      ]
+    },
+    {
+      "id": "nasai",
+      "name": "Sunan an-Nasa'i",
+      "languages": [
+        "ara",
+        "ben",
+        "eng"
+      ]
+    },
+    {
+      "id": "ibnmajah",
+      "name": "Sunan Ibn Majah",
+      "languages": [
+        "ara",
+        "ben",
+        "eng"
+      ]
+    },
+    {
+      "id": "malik",
+      "name": "Muwatta Malik",
+      "languages": [
+        "ara",
+        "ben",
+        "eng"
+      ]
+    }
+  ]
+}

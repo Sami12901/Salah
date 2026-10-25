@@ -1,0 +1,38 @@
+# Build output
+build/
+*.apk
+*.aab
+*.ap_
+app/build/
+app/release/
+
+# Build artifacts are never committed — CI uploads them, and releases attach the APK
+artifacts/
+
+# Gradle
+.gradle/
+gradle-app.setting
+local.properties
+.gradlew.bat.swp
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+captures/
+.navigation/
+.externalNativeBuild/
+.cxx/
+
+# Keystores and signing material — never commit these
+*.jks
+*.keystore
+keystore/
+signing.properties
+
+# Kotlin / KSP
+.kotlin/
+*.hprof
+
+# OS noise
+.DS_Store
+Thumbs.db

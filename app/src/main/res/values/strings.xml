@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Salah</string>
+    <string name="widget_description">Next prayer, today\'s times and the Hijri date</string>
+    <string name="notification_prayer_body">Tap to open Salah</string>
+    <string name="notification_snooze">Snooze 10 min</string>
+    <string name="notification_test_title">Test reminder</string>
+    <string name="notification_test_body">If you can see and hear this, prayer reminders can be delivered.</string>
+</resources>

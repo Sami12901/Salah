@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Wrong prayer time
+    url: https://github.com/OWNER/salah/blob/main/TESTING.md
+    about: Read the calculation notes first — a few minutes of difference from a local mosque is expected.

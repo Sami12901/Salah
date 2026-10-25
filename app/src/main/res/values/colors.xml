@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand emerald, mirrors core/design/Color.kt so the splash and the app agree. -->
+    <color name="salahmate_emerald">#0E5C4A</color>
+    <color name="salahmate_emerald_dark">#0A3D32</color>
+    <color name="salahmate_parchment">#F7F3E7</color>
+</resources>

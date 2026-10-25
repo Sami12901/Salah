@@ -1,0 +1,56 @@
+name: Release
+
+# Builds an installable APK when a version tag is pushed and attaches it to the GitHub Release.
+# NOTE: this produces a DEBUG-signed APK, because a release keystore must never live in the repo.
+# For a store-ready build add SALAHMATE_KEYSTORE / *_PASSWORD / *_ALIAS as repository secrets and
+# switch the task below to :app:assembleRelease (see RELEASE_CHECKLIST.md).
+
+on:
+  push:
+    tags: [ 'v*' ]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Unit tests must pass before shipping
+        run: ./gradlew :app:testDebugUnitTest --stacktrace
+
+      - name: Build APK
+        run: ./gradlew :app:assembleDebug --stacktrace
+
+      - name: Checksums
+        run: |
+          cd app/build/outputs/apk/debug
+          sha256sum *.apk > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Attach APK and checksums to the release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            app/build/outputs/apk/debug/*.apk
+            app/build/outputs/apk/debug/SHA256SUMS.txt
+          body: |
+            Automated build of Salah.
+
+            The attached APK is **debug-signed** and installs as `com.salahmate.app.debug`, so it can
+            sit alongside a release build. Verify the checksum before installing.
+
+            Hardware-dependent behaviour (alarm delivery at the exact minute, widget rendering,
+            compass accuracy, audio output) is implemented but has not been verified on a device —
+            see TESTING.md.
+          draft: false
+          prerelease: false
