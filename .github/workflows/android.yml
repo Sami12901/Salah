@@ -59,6 +59,9 @@ jobs:
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
 
+      - name: Validate minified release APK and app bundle (unsigned CI build only)
+        run: ./gradlew :app:assembleRelease :app:bundleRelease --stacktrace
+
   lint:
     name: Android lint
     runs-on: ubuntu-latest

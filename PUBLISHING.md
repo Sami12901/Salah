@@ -60,7 +60,9 @@ git commit -am "docs: point CI badge at the real repository" && git push
    not request Google's removed `tools` package.
 2. `./gradlew :app:testDebugUnitTest` — unit tests; the HTML report is uploaded as an artifact.
 3. `./gradlew :app:assembleDebug` — the APK is uploaded as the `salah-debug-apk` artifact.
-4. `./gradlew :app:lintDebug` runs as a separate **blocking** job.
+4. `./gradlew :app:assembleRelease :app:bundleRelease` exercises R8/resource shrinking and bundle
+   packaging in CI as an **unsigned validation build only**; it is not a distributable release.
+5. `./gradlew :app:lintDebug` runs as a separate **blocking** job.
 
 `.github/workflows/release.yml` runs on `v*` tags. It requires the tag to match `versionName`, requires
 release signing secrets, reruns unit tests, builds a minified/signed APK and AAB, verifies the APK
