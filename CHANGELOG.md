@@ -34,6 +34,7 @@ First complete build. Everything below is implemented; hardware-dependent behavi
 - Release automation now requires a release keystore, builds minified APK + AAB, verifies the APK, and
   creates a draft release candidate instead of publishing a debug-signed APK.
 - Adhan 1.2.1's licence is confirmed as MIT from the exact upstream tag; its complete notice is bundled.
+- Exact-alarm / notification permission lint findings are handled explicitly; scheduled alarms are counted once, and their identities are persisted for reliable cancellation.
 - The "silent" notification channel was created at `IMPORTANCE_DEFAULT`, which still plays a sound;
   it is now `IMPORTANCE_LOW` (found by the new notification tests).
 - "Cancel all notifications" left the test reminder behind; all app-owned ids are now cancelled.

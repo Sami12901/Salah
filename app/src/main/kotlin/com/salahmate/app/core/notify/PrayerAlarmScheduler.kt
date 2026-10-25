@@ -49,32 +49,56 @@ class PrayerAlarmScheduler(
     fun scheduleAll(alarms: List<PrayerAlarm>): ScheduleReport {
         cancelAll()
         val manager = alarmManager ?: return ScheduleReport(0, 0, exact = false, granted = false)
-        val exact = canScheduleExact()
+        val exact = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            manager.canScheduleExactAlarms()
+        } else {
+            true
+        }
         var scheduled = 0
         val registered = mutableSetOf<String>()
         alarms.forEach { alarm ->
             val pending = pendingIntent(alarm)
-            val success = runCatching {
+            val triggerAt = alarm.triggerAt.toEpochMilli()
+            val success = try {
                 if (exact) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarm.triggerAt.toEpochMilli(), pending)
+                        manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pending)
                     } else {
-                        manager.setExact(AlarmManager.RTC_WAKEUP, alarm.triggerAt.toEpochMilli(), pending)
+                        manager.setExact(AlarmManager.RTC_WAKEUP, triggerAt, pending)
                     }
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pending)
                 } else {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarm.triggerAt.toEpochMilli(), pending)
-                    } else {
-                        manager.set(AlarmManager.RTC_WAKEUP, alarm.triggerAt.toEpochMilli(), pending)
-                    }
+                    manager.set(AlarmManager.RTC_WAKEUP, triggerAt, pending)
                 }
                 true
-            }.getOrDefault(false)
+            } catch (_: SecurityException) {
+                // Exact-alarm access can be revoked after the check. Retry as inexact rather than
+                // silently dropping a reminder; report exact=false through the permission check.
+                if (exact) {
+                    try {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pending)
+                        } else {
+                            manager.set(AlarmManager.RTC_WAKEUP, triggerAt, pending)
+                        }
+                        true
+                    } catch (_: SecurityException) {
+                        false
+                    }
+                } else {
+                    false
+                }
+            }
             if (success) {
                 scheduled++
                 registered += record(alarm)
             }
-            if (success) scheduled++
+        }
+        if (registered.isEmpty()) {
+            prefs.edit().remove(KEY_SCHEDULED).apply()
+        } else {
+            prefs.edit().putStringSet(KEY_SCHEDULED, registered).apply()
         }
         return ScheduleReport(scheduled, alarms.size, exact = exact, granted = true)
     }
@@ -105,11 +129,26 @@ class PrayerAlarmScheduler(
     fun scheduleSnooze(prayer: PrayerKey, minutes: Int = 10) {
         val manager = alarmManager ?: return
         val trigger = System.currentTimeMillis() + minutes * 60_000L
-        runCatching {
-            if (canScheduleExact()) {
-                manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, snoozePendingIntent(prayer))
+        val pending = snoozePendingIntent(prayer)
+        val exact = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            manager.canScheduleExactAlarms()
+        } else {
+            true
+        }
+        try {
+            if (exact) {
+                manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, pending)
             } else {
-                manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, snoozePendingIntent(prayer))
+                manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, pending)
+            }
+        } catch (_: SecurityException) {
+            // Exact-alarm permission may be revoked after the check. Keep the snooze inexact.
+            if (exact) {
+                try {
+                    manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, pending)
+                } catch (_: SecurityException) {
+                    // No notification alarm can be scheduled if the OS rejects even the fallback.
+                }
             }
         }
     }
