@@ -14,9 +14,11 @@ BUILD SUCCESSFUL — :app:testDebugUnitTest
 96 tests, 96 passed, 0 failed, 0 skipped
 ```
 
-This is the last recorded successful test run, not a result rerun in the current sandbox. The latest
-GitHub Actions run on `main` stopped during Android SDK setup before invoking tests or lint. The
-workflow has been updated on the Arena work branch; its new CI run is still pending.
+The earlier 96/96 run is the last result with a test count recorded. A newer GitHub Actions run on PR
+#2 (`40203476334`, commit `9b7d40a`) passed Android SDK setup, `:app:testDebugUnitTest`,
+`:app:assembleDebug`, and `:app:lintDebug`. The run summary available in this environment confirms
+those task steps succeeded, but does not expose the exact test count; see the uploaded
+`unit-test-report` artifact for the detailed report. These are CI checks, not device tests.
 
 | Test class | Tests | Result | What it covers |
 | --- | --- | --- | --- |

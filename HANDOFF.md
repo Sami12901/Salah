@@ -29,9 +29,10 @@ Hard constraints the original requester set — **do not break these**:
 | Item | State |
 | --- | --- |
 | Source | 172 tracked files, ~14k lines of Kotlin in `app/src/main/kotlin/com/salahmate/app/` |
-| Unit tests | **96 tests passed in the last recorded successful run**; not rerun in the current sandbox. The latest GitHub Actions run stopped in Android SDK setup before tests. |
-| Debug build | Last recorded build succeeded (APK ≈28 MB); not rebuilt in the current sandbox. |
-| Git | GitHub `main` at `3591fad`; Arena changes are on `arena/3a3a9b25-salah`. No version tag is present in this checkout. |
+| Unit tests | The prior recorded run was **96/96**. CI run `40203476334` passed `:app:testDebugUnitTest`, but its detailed count is only in the uploaded report artifact. |
+| Debug build | CI run `40203476334` passed `:app:assembleDebug`. |
+| Android lint | CI run `40203476334` passed `:app:lintDebug`. |
+| Git | `main` is at merged setup-fix commit `2ee3335`; Arena changes are on `arena/3a3a9b25-salah` (latest `9b7d40a`). No version tag is present. |
 | Published to GitHub | Repository exists at `Sami12901/Salah`; **no release published**. |
 | Release build | Never run; production signing secrets/keystore not verified. |
 | Device testing | **None.** No emulator, no phone, ever |
@@ -73,10 +74,10 @@ These have unit-tested *logic* but have **never** run on hardware:
 
 ## 5. Open work, in priority order
 
-1. **Re-run CI after fixing the Android SDK setup step.** The failing main run stopped at
-   `android-actions/setup-android@v3` before tests/lint; v3.2.2 requested Google's removed `tools`
-   package. The working branch now uses setup-android v4.0.4 with `platform-tools` only; this change
-   still needs a green GitHub Actions run.
+1. **Confirm CI on the updated main branch.** The initial main run stopped at
+   `android-actions/setup-android@v3` because v3.2.2 requested Google's removed `tools` package. The
+   fix is merged to main, and follow-up PR CI run `40203476334` on commit `9b7d40a` passed tests,
+   debug build, and lint. The main branch's post-merge run should still be checked.
 2. **Release build + R8/ProGuard pass** (`assembleRelease`) — never executed; minification is on for
    release and could break reflection/serialization. The release workflow now requires a signing key
    and creates a draft signed APK/AAB; configure GitHub Actions secrets before tagging.
