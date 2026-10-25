@@ -1,9 +1,7 @@
-name: Release
+name: Release candidate
 
-# Builds an installable APK when a version tag is pushed and attaches it to the GitHub Release.
-# NOTE: this produces a DEBUG-signed APK, because a release keystore must never live in the repo.
-# For a store-ready build add SALAHMATE_KEYSTORE / *_PASSWORD / *_ALIAS as repository secrets and
-# switch the task below to :app:assembleRelease (see RELEASE_CHECKLIST.md).
+# Build a signed release candidate from a version tag, but leave it as a draft for manual review.
+# Never publish a debug-signed APK as a production release.
 
 on:
   push:
@@ -15,42 +13,92 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
-      - uses: gradle/actions/setup-gradle@v4
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4.0.4
+        with:
+          packages: platform-tools
+      - uses: gradle/actions/setup-gradle@v6.4.0
+
+      - name: Validate version and release signing secrets
+        shell: bash
+        env:
+          RELEASE_KEYSTORE_BASE64: ${{ secrets.SALAHMATE_KEYSTORE }}
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.SALAHMATE_KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.SALAHMATE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.SALAHMATE_KEY_PASSWORD }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          [[ -n "$RELEASE_KEYSTORE_BASE64" ]] || { echo 'Missing GitHub Actions secret: SALAHMATE_KEYSTORE'; exit 1; }
+          [[ -n "$RELEASE_KEYSTORE_PASSWORD" ]] || { echo 'Missing GitHub Actions secret: SALAHMATE_KEYSTORE_PASSWORD'; exit 1; }
+          [[ -n "$RELEASE_KEY_ALIAS" ]] || { echo 'Missing GitHub Actions secret: SALAHMATE_KEY_ALIAS'; exit 1; }
+          [[ -n "$RELEASE_KEY_PASSWORD" ]] || { echo 'Missing GitHub Actions secret: SALAHMATE_KEY_PASSWORD'; exit 1; }
+
+          version_name="$(sed -nE 's/^[[:space:]]*versionName[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' app/build.gradle.kts | head -n 1)"
+          if [[ "${RELEASE_TAG#v}" != "$version_name" ]]; then
+            echo "Tag ${RELEASE_TAG} does not match app versionName ${version_name}"
+            exit 1
+          fi
+
+          keystore="$RUNNER_TEMP/salah-release.jks"
+          printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 --decode > "$keystore"
+          test -s "$keystore"
 
       - name: Unit tests must pass before shipping
         run: ./gradlew :app:testDebugUnitTest --stacktrace
 
-      - name: Build APK
-        run: ./gradlew :app:assembleDebug --stacktrace
+      - name: Build signed release APK and app bundle
+        env:
+          SALAHMATE_KEYSTORE: ${{ runner.temp }}/salah-release.jks
+          SALAHMATE_KEYSTORE_PASSWORD: ${{ secrets.SALAHMATE_KEYSTORE_PASSWORD }}
+          SALAHMATE_KEY_ALIAS: ${{ secrets.SALAHMATE_KEY_ALIAS }}
+          SALAHMATE_KEY_PASSWORD: ${{ secrets.SALAHMATE_KEY_PASSWORD }}
+        run: ./gradlew :app:assembleRelease :app:bundleRelease --stacktrace
 
-      - name: Checksums
+      - name: Verify APK signature and release manifest
+        shell: bash
         run: |
-          cd app/build/outputs/apk/debug
-          sha256sum *.apk > SHA256SUMS.txt
+          set -euo pipefail
+          apk="app/build/outputs/apk/release/app-release.apk"
+          test -s "$apk"
+          apksigner="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
+          aapt="$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -n 1)"
+          test -x "$apksigner"
+          test -x "$aapt"
+          "$apksigner" verify --verbose "$apk"
+          if "$aapt" dump badging "$apk" | grep -q 'application-debuggable'; then
+            echo 'Refusing to release a debuggable APK'
+            exit 1
+          fi
+
+      - name: Generate checksums
+        run: |
+          cd app/build/outputs
+          find apk/release bundle/release -type f \( -name '*.apk' -o -name '*.aab' \) -print0 \
+            | sort -z \
+            | xargs -0 sha256sum > SHA256SUMS.txt
           cat SHA256SUMS.txt
 
-      - name: Attach APK and checksums to the release
-        uses: softprops/action-gh-release@v2
+      - name: Attach signed artifacts to a draft GitHub release
+        uses: softprops/action-gh-release@v3.0.3
         with:
           files: |
-            app/build/outputs/apk/debug/*.apk
-            app/build/outputs/apk/debug/SHA256SUMS.txt
+            app/build/outputs/apk/release/*.apk
+            app/build/outputs/bundle/release/*.aab
+            app/build/outputs/SHA256SUMS.txt
           body: |
-            Automated build of Salah.
+            Signed Salah release candidate for ${{ github.ref_name }}.
 
-            The attached APK is **debug-signed** and installs as `com.salahmate.app.debug`, so it can
-            sit alongside a release build. Verify the checksum before installing.
+            This is a **draft** for manual review. Do not publish until the release checklist is complete,
+            including supported-device checks and all content/licensing reviews. See RELEASE_CHECKLIST.md.
 
-            Hardware-dependent behaviour (alarm delivery at the exact minute, widget rendering,
-            compass accuracy, audio output) is implemented but has not been verified on a device —
-            see TESTING.md.
-          draft: false
+            Verify the attached SHA-256 checksums before installing.
+          draft: true
           prerelease: false

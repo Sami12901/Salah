@@ -2,12 +2,16 @@
 
 ## Blockers (must be resolved before any public release)
 
-- [ ] **Confirm the `com.batoulapps.adhan:adhan:1.2.1` licence.** The published POM has an empty
-      `<license/>` element. Either obtain written confirmation, or replace the library with an
-      in-house solar-position implementation (the domain tests in `LocalAdhanProviderTest` already
-      pin the expected output within ±2 minutes, so the swap is verifiable).
 - [ ] Run the manual device checklist in [TESTING.md](TESTING.md) on at least one Android 12, one
       Android 14 and one Android 16 device.
+- [ ] Confirm a production signing keystore is available to the release workflow and never commit
+      it to the repository. The workflow publishes only a **draft** release candidate for review.
+
+### Resolved release review
+
+- [x] **Adhan `com.batoulapps.adhan:adhan:1.2.1` licence confirmed as MIT** against the upstream
+      `v1.2.1` source tag and its exact Maven coordinates; the full notice is bundled at
+      `app/src/main/assets/licenses/adhan-MIT.txt`. See [CONTENT_LICENSES.md](CONTENT_LICENSES.md).
 - [ ] Verify the widget renders and refreshes on a real launcher.
 - [ ] Verify notification delivery, snooze, reboot re-arming and the inexact fallback.
 - [ ] Verify compass behaviour and the low-accuracy path on a device with and without a magnetometer.

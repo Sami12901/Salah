@@ -38,7 +38,7 @@
 | Kotlin standard library / kotlinx.coroutines / kotlinx.serialization | 2.3.21 / 1.10.2 / 1.9.0 | Apache License 2.0 |
 | Retrofit | 3.0.0 | Apache License 2.0 |
 | OkHttp | 5.1.0 | Apache License 2.0 |
-| Adhan (batoulapps) | 1.2.1 | **Unverified.** The published POM contains an empty `<license/>` element and the repository does not state a licence file at the artefact level. Treated as a **release blocker** until confirmed: either confirm the licence from the upstream repository, or replace the library with an in-house calculation. See RELEASE_CHECKLIST.md |
+| Adhan (Batoul Apps) | 1.2.1 | **MIT (confirmed).** The upstream `v1.2.1` tag at commit `eefc4ed1b910ec144dff247f45b2b23a16c7d0c2` includes the MIT `LICENSE`; its README at that same tag lists the exact Maven coordinate `com.batoulapps.adhan:adhan:1.2.1`. The published POM's empty `<license/>` is incomplete metadata, not the only licence evidence. The MIT copyright and licence text are bundled in the app at `assets/licenses/adhan-MIT.txt`. |
 | JUnit 4 | 4.13.2 | Eclipse Public License 1.0 |
 | Robolectric | 4.16 | MIT |
 | MockK | 1.14.7 | Apache License 2.0 |

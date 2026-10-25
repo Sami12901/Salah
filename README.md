@@ -208,5 +208,6 @@ can sit next to a release install.
   optimisation settings; the UI reports the actual state instead of promising delivery.
 - Audio playback, the widget, the compass and background notification behaviour were **not** verified
   on hardware in this environment.
-- The `adhan` library's licence could not be confirmed from its published POM; see
-  CONTENT_LICENSES.md.
+- Adhan 1.2.1's published POM has incomplete licence metadata, but its upstream `v1.2.1` source
+  contains the MIT licence and lists the exact Maven coordinate; the full notice is bundled in the
+  app. See CONTENT_LICENSES.md.

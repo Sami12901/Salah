@@ -13,22 +13,24 @@ jobs:
     timeout-minutes: 40
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '17'
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4.0.4
+        with:
+          packages: platform-tools
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6.4.0
 
       - name: Cache Gradle packages
-        uses: actions/cache@v4
+        uses: actions/cache@v6.1.0
         with:
           path: |
             ~/.gradle/caches
@@ -41,7 +43,7 @@ jobs:
 
       - name: Publish test report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: unit-test-report
           path: app/build/reports/tests/testDebugUnitTest
@@ -51,7 +53,7 @@ jobs:
         run: ./gradlew :app:assembleDebug --stacktrace
 
       - name: Upload APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: salah-debug-apk
           path: app/build/outputs/apk/debug/*.apk
@@ -61,20 +63,22 @@ jobs:
     name: Android lint
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
-      - uses: gradle/actions/setup-gradle@v4
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4.0.4
+        with:
+          packages: platform-tools
+      - uses: gradle/actions/setup-gradle@v6.4.0
       - name: Lint
         run: ./gradlew :app:lintDebug --stacktrace
       - name: Upload lint report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: lint-report
           path: app/build/reports/lint-results-debug.html
