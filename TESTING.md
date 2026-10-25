@@ -14,9 +14,9 @@ BUILD SUCCESSFUL — :app:testDebugUnitTest
 96 tests, 96 passed, 0 failed, 0 skipped
 ```
 
-The earlier 96/96 run is the last result with a test count recorded. The latest GitHub Actions run on
-`main` (`40205256092`, merge commit `2480b22`) passed Android SDK setup, `:app:testDebugUnitTest`,
-`:app:assembleDebug`, `:app:assembleRelease`, `:app:bundleRelease`, and `:app:lintDebug`. Release
+The earlier 96/96 run is the last result with a test count recorded. GitHub Actions run
+`40206520081` on `main` passed Android SDK setup, `:app:testDebugUnitTest`, `:app:assembleDebug`,
+`:app:assembleRelease`, `:app:bundleRelease`, and `:app:lintDebug`. Release
 assembly exercised minification/resource shrinking and AAB packaging as **unsigned CI validation
 outputs only**; no production-signed release was built. The run summary available here does not expose
 the exact test count; see the uploaded `unit-test-report` artifact for the detailed report. These are

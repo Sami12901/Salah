@@ -3,7 +3,7 @@
 Read this first if you are a new assistant/agent picking up this project. It exists so you do **not**
 have to guess what was done, what was verified, and what is still open.
 
-Last updated: 2026-10-25 · GitHub repo `Sami12901/Salah` · `main` HEAD `2480b22` · no release/tag published. Arena work is on `arena/3a3a9b25-salah`.
+Last updated: 2026-10-25 · GitHub repo `Sami12901/Salah` · CI/release workflow fixes merged to `main` · no release/tag published. Arena work is on `arena/3a3a9b25-salah`.
 
 ---
 
@@ -33,7 +33,7 @@ Hard constraints the original requester set — **do not break these**:
 | Debug build | Latest CI run `40205256092` passed `:app:assembleDebug`. |
 | Android lint | Latest CI run `40205256092` passed `:app:lintDebug`. |
 | Release packaging | Latest CI run passed `:app:assembleRelease` and `:app:bundleRelease` as **unsigned validation** only; no signed release artifact. |
-| Git | `main` is at `2480b22`; Arena branch `arena/3a3a9b25-salah` contains the same merged work plus current doc updates. No version tag/release exists. |
+| Git | CI/release fixes and the corresponding docs are merged to `main`; Arena work stays on `arena/3a3a9b25-salah`. No version tag/release exists. |
 | Published to GitHub | Repository exists at `Sami12901/Salah`; **no release published**. |
 | Release build | Never run; production signing secrets/keystore not verified. |
 | Device testing | **None.** No emulator, no phone, ever |
