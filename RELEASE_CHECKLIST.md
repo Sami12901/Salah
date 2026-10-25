@@ -19,7 +19,9 @@
 ## Build
 
 - [ ] `./gradlew :app:testDebugUnitTest --rerun-tasks` — all tests pass
-- [ ] `./gradlew :app:assembleRelease`
+- [x] `:app:assembleRelease :app:bundleRelease` in CI — unsigned validation build passed, including
+      minification/resource shrinking and bundle packaging. This is **not** a signed distributable.
+- [ ] Signed `./gradlew :app:assembleRelease` using the production keystore
 - [ ] Keystore held outside the repository; `SALAHMATE_KEYSTORE*` environment variables set
 - [ ] `app/build.gradle.kts` versionCode/versionName bumped
 - [ ] Room schema export committed (`app/schemas/`) and a migration test present if the schema changed

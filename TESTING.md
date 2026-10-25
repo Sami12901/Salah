@@ -14,11 +14,13 @@ BUILD SUCCESSFUL — :app:testDebugUnitTest
 96 tests, 96 passed, 0 failed, 0 skipped
 ```
 
-The earlier 96/96 run is the last result with a test count recorded. A newer GitHub Actions run on PR
-#2 (`40203476334`, commit `9b7d40a`) passed Android SDK setup, `:app:testDebugUnitTest`,
-`:app:assembleDebug`, and `:app:lintDebug`. The run summary available in this environment confirms
-those task steps succeeded, but does not expose the exact test count; see the uploaded
-`unit-test-report` artifact for the detailed report. These are CI checks, not device tests.
+The earlier 96/96 run is the last result with a test count recorded. The latest GitHub Actions run on
+`main` (`40205256092`, merge commit `2480b22`) passed Android SDK setup, `:app:testDebugUnitTest`,
+`:app:assembleDebug`, `:app:assembleRelease`, `:app:bundleRelease`, and `:app:lintDebug`. Release
+assembly exercised minification/resource shrinking and AAB packaging as **unsigned CI validation
+outputs only**; no production-signed release was built. The run summary available here does not expose
+the exact test count; see the uploaded `unit-test-report` artifact for the detailed report. These are
+CI checks, not device tests.
 
 | Test class | Tests | Result | What it covers |
 | --- | --- | --- | --- |
@@ -35,6 +37,7 @@ those task steps succeeded, but does not expose the exact test count; see the up
 | `core.NotificationPostingTest` | 6 | pass | **Robolectric**: channels exist with correct importance (silent really silent), channel selection, title wording, snooze action, replacement of a previous alert, nothing posted without permission, cancel clears app-owned ids |
 | `core.notify.NotificationContentTest` | 4 | pass | Advance / on-time / snoozed wording in both languages, channel + urgency selection, stable unique ids |
 | `core.notify.PrayerAlarmComputeTest` | 5 | pass | Disabled reminders, sunrise excluded, per-prayer opt-out, advance shift, past alarms dropped, sort order and day horizon |
+| `core.PrayerAlarmSchedulerTest` | 2 | pass in CI run `40205256092` | Robolectric: scheduled alarms counted once and persisted/cancelled by identity; inexact fallback without exact-alarm access |
 | `data.AyahAudioTest` | 5 | pass | CDN URL layout, per-reciter cache paths, next/previous ayah boundaries, local-vs-stream source |
 | `widget.WidgetContentTest` | 6 | pass | Next prayer, countdown, five schedule rows, Hijri line with offset, Bengali labels, empty state for missing/incomplete data, method label |
 | `domain.ZakatCalculatorTest` | 9 | pass | 2.5% rate, both nisab bases, debt deduction, never-negative net wealth, missing-price and stale-price warnings |

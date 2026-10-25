@@ -20,9 +20,9 @@ the app's private storage on the device.
 | Item | State |
 | --- | --- |
 | Debug build | **BUILD SUCCESSFUL** — `./gradlew :app:assembleDebug`, APK 27 MB, copy at `artifacts/salah-1.0.0-debug.apk` |
-| Unit tests | **96 tests, 96 passed, 0 failed** — see [TESTING.md](TESTING.md) for the per-class table |
+| Unit tests | Latest CI test task passed; the last recorded detailed count was **96/96** before two scheduler tests were added. The current report is attached to CI run `40205256092`; see [TESTING.md](TESTING.md). |
 | Instrumented tests | **Not run** — no emulator or physical device was available in the build environment |
-| Release build | Not produced (no keystore in this environment); see [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) |
+| Signed release build | **Not produced**. CI passed an unsigned R8/ProGuard APK + AAB packaging check; a production keystore and device verification are still required. See [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) |
 
 ### What is verified, and how
 
@@ -30,7 +30,7 @@ the app's private storage on the device.
 | --- | --- | --- |
 | Prayer-time calculation | **Verified** | 8 tests vs recorded AlAdhan values (Dhaka/London/Oslo) within ±2 min |
 | AlAdhan parsing / failures | **Verified** | 6 tests over recorded fixtures, incl. the 503-in-body error shape |
-| Reminder scheduling logic | **Verified** | 5 tests: opt-out, advance shift, past alarms dropped, horizon, sunrise excluded |
+| Reminder scheduling logic | **Verified as logic** | 5 planner tests; 2 additional Robolectric tests cover alarm count, persisted cancellation identity and inexact fallback. Actual OS delivery remains unverified. |
 | Notification posting & channels | **Verified in a Robolectric runtime** | 6 tests: channel importance, channel choice, snooze action, replacement, denied-permission path |
 | Widget content | **Verified as data** | 6 tests: next prayer, countdown, schedule rows, Hijri line, empty state |
 | Compass maths | **Verified as maths** | 9 tests: bearings, shortest-arc smoothing, alignment, calibration levels |
