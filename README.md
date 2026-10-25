@@ -20,7 +20,7 @@ the app's private storage on the device.
 | Item | State |
 | --- | --- |
 | Debug build | **BUILD SUCCESSFUL** — `./gradlew :app:assembleDebug`, APK 27 MB, copy at `artifacts/salah-1.0.0-debug.apk` |
-| Unit tests | Latest CI test task passed; the last recorded detailed count was **96/96** before two scheduler tests were added. The current report is attached to CI run `40205256092`; see [TESTING.md](TESTING.md). |
+| Unit tests | Latest CI test task passed; the last recorded detailed count was **96/96** before two scheduler tests were added. The current report is attached to CI run `40206520081`; see [TESTING.md](TESTING.md). |
 | Instrumented tests | **Not run** — no emulator or physical device was available in the build environment |
 | Signed release build | **Not produced**. CI passed an unsigned R8/ProGuard APK + AAB packaging check; a production keystore and device verification are still required. See [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) |
 
