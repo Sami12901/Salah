@@ -1,8 +1,9 @@
 # Publishing this repository
 
-The repo is already initialised locally on branch `main` with one commit and a `v1.0.0` tag.
-There is **no GitHub credential in this environment**, so the push below has not been performed —
-run it from a machine (or terminal) where you are signed in to GitHub.
+This project is hosted at <https://github.com/Sami12901/Salah>. The current `main` commit is
+`3591fad`; no version tag or GitHub Release is published yet. The procedures below are retained for
+forks and fresh repositories. A signed draft-release workflow is configured, but it needs repository
+signing secrets and the release checklist must be completed before any draft is published.
 
 ## 0. One-command option
 
@@ -55,19 +56,23 @@ git commit -am "docs: point CI badge at the real repository" && git push
 
 `.github/workflows/android.yml` runs on every push and pull request:
 
-1. JDK 17 + Android SDK setup, Gradle caching.
-2. `./gradlew :app:testDebugUnitTest` — the 96 unit tests. The HTML report is uploaded as an artifact.
+1. JDK 17 + Android SDK setup, Gradle caching. The SDK action installs only `platform-tools`; it does
+   not request Google's removed `tools` package.
+2. `./gradlew :app:testDebugUnitTest` — unit tests; the HTML report is uploaded as an artifact.
 3. `./gradlew :app:assembleDebug` — the APK is uploaded as the `salah-debug-apk` artifact.
-4. A separate, non-blocking `lintDebug` job.
+4. `./gradlew :app:lintDebug` runs as a separate **blocking** job.
 
-`.github/workflows/release.yml` runs when a `v*` tag is pushed: it re-runs the tests, builds the APK,
-writes a `SHA256SUMS.txt`, and attaches both to the GitHub Release. That APK is **debug-signed** on
-purpose — a release keystore must never be committed. To produce a store-ready build, add these
-repository secrets and switch the task in the workflow to `:app:assembleRelease`:
+`.github/workflows/release.yml` runs on `v*` tags. It requires the tag to match `versionName`, requires
+release signing secrets, reruns unit tests, builds a minified/signed APK and AAB, verifies the APK
+signature and non-debuggable manifest, and attaches checksums to a **draft** GitHub release. A draft
+must stay unpublished until the device, content, licensing and store checklist is complete.
+
+Configure these repository secrets in GitHub Settings → Secrets and variables → Actions; do not send
+them in chat or commit them to the repository:
 
 | Secret | Meaning |
 | --- | --- |
-| `SALAHMATE_KEYSTORE` | Base64 of the `.jks` file (decode it in a CI step) |
+| `SALAHMATE_KEYSTORE` | Base64-encoded `.jks` file |
 | `SALAHMATE_KEYSTORE_PASSWORD` | Keystore password |
 | `SALAHMATE_KEY_ALIAS` | Key alias |
 | `SALAHMATE_KEY_PASSWORD` | Key password |
@@ -110,9 +115,8 @@ Re-run that bundle command after any commit you care about.
 
 ## 7. Before the first public release
 
-Work through [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md). Two items are genuine blockers:
-
-1. The `com.batoulapps.adhan:adhan:1.2.1` licence is unconfirmed (empty `<license/>` in its POM).
-2. Hardware behaviour — alarm delivery at the exact minute, widget rendering, compass accuracy and
-   audio output — has not been tested on a device. The maths and content behind them are unit-tested;
-   the device behaviour is not.
+Work through [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md). The Adhan 1.2.1 licence has been confirmed
+as MIT from its exact upstream tag. The main release blocker remains hardware behaviour: alarm delivery
+at the exact minute, widget rendering, compass accuracy and audio output have not been tested on a
+device. The maths and content behind them are unit-tested; the device behaviour is not. A production
+signing key must also be configured in GitHub Actions before generating a signed candidate.

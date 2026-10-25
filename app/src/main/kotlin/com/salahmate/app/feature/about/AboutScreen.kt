@@ -126,8 +126,8 @@ fun AboutScreen(settings: UserSettings, onBack: () -> Unit) {
                     Text(
                         t(
                             bn,
-                            "কুরআনের আরবি টেক্সট ও অনুবাদ: AlQuran.cloud। হাদিস: ফাওয়াজ আহমেদের হাদিস-এপিআই (Unlicense), মূল উৎস sunnah.com। সময়সূচি গণনা: Adhan (বাটুল অ্যাপস)। স্থানীয় সংকলিত দুআ ও শিক্ষামূলক বিষয়বস্তু উৎসসহ দেওয়া আছে। বিস্তারিত docs/CONTENT_LICENSES.md-এ।",
-                            "Quran Arabic text and translations: AlQuran.cloud. Hadith: Fawaz Ahmed's hadith-api (Unlicense), originally from sunnah.com. Prayer calculations: Adhan by Batoul Apps. Bundled dua and learning content carry their sources inline. Full details in docs/CONTENT_LICENSES.md.",
+                            "কুরআনের আরবি টেক্সট ও অনুবাদ: AlQuran.cloud। হাদিস: ফাওয়াজ আহমেদের হাদিস-এপিআই (Unlicense), মূল উৎস sunnah.com। সময়সূচি গণনা: Adhan 1.2.1 (Batoul Apps; MIT লাইসেন্স, পূর্ণ লাইসেন্স অ্যাপে অন্তর্ভুক্ত)। স্থানীয় সংকলিত দুআ ও শিক্ষামূলক বিষয়বস্তু উৎসসহ দেওয়া আছে। বিস্তারিত docs/CONTENT_LICENSES.md-এ।",
+                            "Quran Arabic text and translations: AlQuran.cloud. Hadith: Fawaz Ahmed's hadith-api (Unlicense), originally from sunnah.com. Prayer calculations: Adhan 1.2.1 by Batoul Apps (MIT; full licence text is bundled in the app). Bundled dua and learning content carry their sources inline. Full details in docs/CONTENT_LICENSES.md.",
                         ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,

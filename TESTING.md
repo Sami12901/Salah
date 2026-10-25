@@ -14,6 +14,10 @@ BUILD SUCCESSFUL — :app:testDebugUnitTest
 96 tests, 96 passed, 0 failed, 0 skipped
 ```
 
+This is the last recorded successful test run, not a result rerun in the current sandbox. The latest
+GitHub Actions run on `main` stopped during Android SDK setup before invoking tests or lint. The
+workflow has been updated on the Arena work branch; its new CI run is still pending.
+
 | Test class | Tests | Result | What it covers |
 | --- | --- | --- | --- |
 | `core.HijriCalendarTest` | 6 | pass | Gregorian ↔ Hijri conversion against fixed known dates, offset handling, malformed input |

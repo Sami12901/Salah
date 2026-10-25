@@ -3,7 +3,7 @@
 Read this first if you are a new assistant/agent picking up this project. It exists so you do **not**
 have to guess what was done, what was verified, and what is still open.
 
-Last updated: 2026-10-25 · Branch `main` · Tag `v1.0.0` · HEAD `cac7bfe`
+Last updated: 2026-10-25 · GitHub repo `Sami12901/Salah` · `main` HEAD `3591fad` · no release/tag published. Arena work is on `arena/3a3a9b25-salah`.
 
 ---
 
@@ -28,12 +28,12 @@ Hard constraints the original requester set — **do not break these**:
 
 | Item | State |
 | --- | --- |
-| Source | 171 tracked files, ~13k lines of Kotlin in `app/src/main/kotlin/com/salahmate/app/` |
-| Unit tests | **96 tests, 96 passed, 0 failed** (last run before the newest docs-only commits) |
-| Debug build | **BUILD SUCCESSFUL**, APK ≈28 MB (`app-debug.apk`) |
-| Git | `main` at `cac7bfe`, clean, tagged `v1.0.0`, bundle at `/home/user/salah-repo.bundle` |
-| Published to GitHub | **No** — no credential exists in the sandbox (see §6) |
-| Release build | Never run (no keystore) |
+| Source | 172 tracked files, ~14k lines of Kotlin in `app/src/main/kotlin/com/salahmate/app/` |
+| Unit tests | **96 tests passed in the last recorded successful run**; not rerun in the current sandbox. The latest GitHub Actions run stopped in Android SDK setup before tests. |
+| Debug build | Last recorded build succeeded (APK ≈28 MB); not rebuilt in the current sandbox. |
+| Git | GitHub `main` at `3591fad`; Arena changes are on `arena/3a3a9b25-salah`. No version tag is present in this checkout. |
+| Published to GitHub | Repository exists at `Sami12901/Salah`; **no release published**. |
+| Release build | Never run; production signing secrets/keystore not verified. |
 | Device testing | **None.** No emulator, no phone, ever |
 
 ### Test classes (all passing)
@@ -73,17 +73,23 @@ These have unit-tested *logic* but have **never** run on hardware:
 
 ## 5. Open work, in priority order
 
-1. **Release build + R8/ProGuard pass** (`assembleRelease`) — never executed; minification is on for
-   release and could break reflection/serialization. Add a throwaway keystore, build, install.
-2. **Device test pass** — run the TESTING.md checklist, then move items out of §4 as they pass.
-3. **`com.batoulapps.adhan:adhan:1.2.1` licence is unconfirmed** — its POM has an empty `<license/>`.
-   This is the only true release blocker. Either confirm upstream or replace with an in-house solar
-   implementation; `LocalAdhanProviderTest` already pins expected output within ±2 minutes so a swap
-   is verifiable.
+1. **Re-run CI after fixing the Android SDK setup step.** The failing main run stopped at
+   `android-actions/setup-android@v3` before tests/lint; v3.2.2 requested Google's removed `tools`
+   package. The working branch now uses setup-android v4.0.4 with `platform-tools` only; this change
+   still needs a green GitHub Actions run.
+2. **Release build + R8/ProGuard pass** (`assembleRelease`) — never executed; minification is on for
+   release and could break reflection/serialization. The release workflow now requires a signing key
+   and creates a draft signed APK/AAB; configure GitHub Actions secrets before tagging.
+3. **Device test pass** — run the TESTING.md checklist, then move items out of §4 as they pass. This
+   is still a blocker before publishing a stable release.
 4. Room migration test v1 → v2 (schema export exists in `app/schemas/`, no migration test yet).
 5. Instrumented tests for Compose screens (none exist; `androidTest` has only dependencies).
 6. Rename the package `com.salahmate.app` → `app.salah` **only** if breaking upgrades is acceptable
    (applicationId change means a new install, not an update).
+
+**Resolved:** Adhan 1.2.1 is MIT-licensed: the exact upstream `v1.2.1` source tag includes the MIT
+license and its README lists `com.batoulapps.adhan:adhan:1.2.1`. The full MIT notice is bundled in the
+app. See `CONTENT_LICENSES.md`.
 
 ## 6. Environment gotchas — these cost real time
 
@@ -95,8 +101,9 @@ These have unit-tested *logic* but have **never** run on hardware:
 - **`gradlew` loses its executable bit** after a restore → `chmod +x gradlew` (that is the only cause
   of `Permission denied` on `./gradlew`).
 - **No swap = Gradle daemon "disappears unexpectedly"** (kernel OOM). Keep `-Xmx1280m`, add swap.
-- **No GitHub credential exists.** `api.github.com` is reachable but `POST /user/repos` returns 401.
-  `publish.sh` is ready; it needs `GITHUB_TOKEN` or `gh auth login`. Do not claim a push happened.
+- GitHub authentication depends on the active Arena connection. Use `gh auth status` before a push or PR;
+  never request or paste credentials in chat. This session can query the existing repository, but that
+  does not imply a signed release keystore or GitHub Actions secrets are available.
 - Kotlin quirks already fixed — **do not reintroduce**:
   `flow.first(x)` is invalid here, always `x.first()` · Room cannot persist `Instant` (use Long) ·
   `@Upsert` misuse · Compose BOM must stay 2025.12.01 with AGP 8.13.2 · no `textDirection` parameter
@@ -131,6 +138,6 @@ Expect: 96 tests pass, APK produced. If the numbers differ, investigate before t
 
 `README.md` overview + verified/not-verified matrix · `BUILD.md` toolchain and commands ·
 `TESTING.md` real results + device checklist · `API_SOURCES.md` every endpoint and verified fields ·
-`CONTENT_LICENSES.md` content + library licences (incl. the Adhan caveat) · `PRIVACY.md` data flows and
+`CONTENT_LICENSES.md` content + library licences (incl. the Adhan MIT confirmation) · `PRIVACY.md` data flows and
 permissions · `RELEASE_CHECKLIST.md` blockers · `PUBLISHING.md` GitHub/CI setup · `CHANGELOG.md`
 changes + known limitations · `CONTRIBUTING.md` project rules.
