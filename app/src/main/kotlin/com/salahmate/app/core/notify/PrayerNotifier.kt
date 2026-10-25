@@ -81,8 +81,10 @@ object PrayerNotifier {
             builder.setSound(null)
         }
 
-        runCatching {
+        try {
             NotificationManagerCompat.from(context).notify(NotificationContent.idFor(prayer), builder.build())
+        } catch (_: SecurityException) {
+            // Permission may be revoked by the OS between the explicit grant check and posting.
         }
     }
 
@@ -96,8 +98,10 @@ object PrayerNotifier {
             .setContentText(context.getString(R.string.notification_test_body))
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-        runCatching {
+        try {
             NotificationManagerCompat.from(context).notify(NotificationContent.TEST_NOTIFICATION_ID, builder.build())
+        } catch (_: SecurityException) {
+            // Permission may be revoked by the OS between the explicit grant check and posting.
         }
     }
 
