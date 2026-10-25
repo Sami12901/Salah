@@ -1,7 +1,7 @@
 # Publishing this repository
 
 This project is hosted at <https://github.com/Sami12901/Salah>. The current `main` commit is
-`3591fad`; no version tag or GitHub Release is published yet. The procedures below are retained for
+`2480b22`; no version tag or GitHub Release is published yet. The procedures below are retained for
 forks and fresh repositories. A signed draft-release workflow is configured, but it needs repository
 signing secrets and the release checklist must be completed before any draft is published.
 

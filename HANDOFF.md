@@ -3,7 +3,7 @@
 Read this first if you are a new assistant/agent picking up this project. It exists so you do **not**
 have to guess what was done, what was verified, and what is still open.
 
-Last updated: 2026-10-25 · GitHub repo `Sami12901/Salah` · `main` HEAD `3591fad` · no release/tag published. Arena work is on `arena/3a3a9b25-salah`.
+Last updated: 2026-10-25 · GitHub repo `Sami12901/Salah` · `main` HEAD `2480b22` · no release/tag published. Arena work is on `arena/3a3a9b25-salah`.
 
 ---
 
@@ -28,11 +28,12 @@ Hard constraints the original requester set — **do not break these**:
 
 | Item | State |
 | --- | --- |
-| Source | 172 tracked files, ~14k lines of Kotlin in `app/src/main/kotlin/com/salahmate/app/` |
-| Unit tests | The prior recorded run was **96/96**. CI run `40203476334` passed `:app:testDebugUnitTest`, but its detailed count is only in the uploaded report artifact. |
-| Debug build | CI run `40203476334` passed `:app:assembleDebug`. |
-| Android lint | CI run `40203476334` passed `:app:lintDebug`. |
-| Git | `main` is at merged setup-fix commit `2ee3335`; Arena changes are on `arena/3a3a9b25-salah` (latest `9b7d40a`). No version tag is present. |
+| Source | 174 tracked files, ~14k lines of Kotlin in `app/src/main/kotlin/com/salahmate/app/` |
+| Unit tests | Prior recorded count was **96/96**. Latest CI run `40205256092` passed `:app:testDebugUnitTest`; exact count is in the uploaded report artifact. |
+| Debug build | Latest CI run `40205256092` passed `:app:assembleDebug`. |
+| Android lint | Latest CI run `40205256092` passed `:app:lintDebug`. |
+| Release packaging | Latest CI run passed `:app:assembleRelease` and `:app:bundleRelease` as **unsigned validation** only; no signed release artifact. |
+| Git | `main` is at `2480b22`; Arena branch `arena/3a3a9b25-salah` contains the same merged work plus current doc updates. No version tag/release exists. |
 | Published to GitHub | Repository exists at `Sami12901/Salah`; **no release published**. |
 | Release build | Never run; production signing secrets/keystore not verified. |
 | Device testing | **None.** No emulator, no phone, ever |
@@ -74,13 +75,13 @@ These have unit-tested *logic* but have **never** run on hardware:
 
 ## 5. Open work, in priority order
 
-1. **Confirm CI on the updated main branch.** The initial main run stopped at
-   `android-actions/setup-android@v3` because v3.2.2 requested Google's removed `tools` package. The
-   fix is merged to main, and follow-up PR CI run `40203476334` on commit `9b7d40a` passed tests,
-   debug build, and lint. The main branch's post-merge run should still be checked.
-2. **Release build + R8/ProGuard pass** (`assembleRelease`) — never executed; minification is on for
-   release and could break reflection/serialization. The release workflow now requires a signing key
-   and creates a draft signed APK/AAB; configure GitHub Actions secrets before tagging.
+1. **CI setup fix confirmed on main.** The original run failed at `android-actions/setup-android@v3`
+   because v3.2.2 requested Google's removed `tools` package. Main CI run `40205256092` passed tests,
+   debug build, unsigned R8 release APK/AAB packaging, and lint.
+2. **Signed release build and R8/ProGuard artifact review.** Minification and packaging passed in CI,
+   but that run was unsigned and not distributable. The tag workflow requires the production signing
+   key and creates a draft signed APK/AAB; configure the four GitHub Actions secrets and review the
+   signed candidate before publishing.
 3. **Device test pass** — run the TESTING.md checklist, then move items out of §4 as they pass. This
    is still a blocker before publishing a stable release.
 4. Room migration test v1 → v2 (schema export exists in `app/schemas/`, no migration test yet).
